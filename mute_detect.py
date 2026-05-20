@@ -70,6 +70,10 @@ def get_sounded_sections(vars: Variables):
             end = str(vars.total_duration)
 
         duration = float(end) - float(start)
+
+        if duration == 0:
+            return
+
         if duration < vars.args.min_duration:
             altered_clips += 1
             desired_end = float(end) + vars.args.min_duration - duration
