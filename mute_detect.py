@@ -47,7 +47,7 @@ def get_muted_sections(vars: Variables):
     for idx, (start, end, duration) in enumerate(vars.muted_sections, start=1):
         vars.total_muted_duration += float(duration)
         if vars.args.verbose:
-            sys.stdout.write(f"{idx}. Start: {format_time(start)}, End: {format_time(end)}, Duration: {format_time(duration)}\n")
+            sys.stdout.write(f"{idx}. Start: {format_time(start)} ({start}), End: {format_time(end)} ({end}), Duration: {format_time(duration)} ({duration})\n")
     if vars.args.verbose:
         sys.stdout.flush()
 
@@ -107,7 +107,11 @@ def get_sounded_sections(vars: Variables):
     for idx, clip in enumerate(vars.sounded_sections, start=1):
         vars.total_sounded_duration += float(clip["duration"])
         if vars.args.verbose:
-            sys.stdout.write(f"{idx}. Output: {clip['file']}, Start: {format_time(clip['start'])}, End: {format_time(clip['end'])}, Duration: {format_time(clip['duration'])}\n")
+            file = clip['file']
+            start = clip['start']
+            end = clip['end']
+            duration = clip['duration']
+            sys.stdout.write(f"{idx}. Output: {file}, Start: {format_time(start)} ({start}), End: {format_time(end)} ({end}), Duration: {format_time(duration)} ({duration})\n")
     if vars.args.verbose:
         sys.stdout.flush()
 
