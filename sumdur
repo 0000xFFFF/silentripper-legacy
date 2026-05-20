@@ -1,34 +1,13 @@
 #!/usr/bin/env python3
+
 import argparse
-import subprocess
 import sys
 import glob
 import os
 
-def get_duration(filename: str) -> float:
-    """Return duration of a video file in seconds using ffprobe."""
-    result = subprocess.run(
-        [
-            "ffprobe", "-v", "error",
-            "-show_entries", "format=duration",
-            "-of", "csv=p=0",
-            filename
-        ],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True
-    )
-    try:
-        return float(result.stdout.strip())
-    except ValueError:
-        print(f"⚠️ Could not read duration for {filename}", file=sys.stderr)
-        return 0.0
+from tabulate import tabulate
 
-def format_hms(seconds: float) -> str:
-    total = int(round(seconds))
-    hours, remainder = divmod(total, 3600)
-    minutes, secs = divmod(remainder, 60)
-    return f"{hours:02d}:{minutes:02d}:{secs:02d}"
+from helpers import get_video_duration, format_time
 
 def main():
     parser = argparse.ArgumentParser(
@@ -54,20 +33,27 @@ def main():
 
     total = 0
 
-    for f in file_list:
-        if os.path.isfile(f):
+    table = []
+    for file in file_list:
+        if os.path.isfile(file):
+            duration = 0
+            try:
+                duration = get_video_duration(file)
+            except:
+                continue
+            total += duration
             if args.verbose:
-                print(f, end='')
-            dur = get_duration(f)
-            total += dur
-            if args.verbose:
-                print(f" -- {format_hms(dur)} ({dur} s)")
+                table.append([file, format_time(duration), duration])
 
-    print(f"Total duration: {format_hms(total)} ({total:.2f} seconds)")
+    if args.verbose:
+        print(tabulate(table, headers=["File","Duration", "Seconds"]))
+
+
+    print(f"Total duration....: {format_time(total)} ({total:.2f} seconds)")
 
     if args.half_time:
         half = total/2
-        print(f"x2 (half) duration: {format_hms(half)} ({half:.2f} seconds)")
+        print(f"x2 (half) duration: {format_time(half)} ({half:.2f} seconds)")
 
 if __name__ == "__main__":
     main()
