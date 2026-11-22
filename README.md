@@ -1,3 +1,5 @@
+project development moved to: [silentripper](https://github.com/0000xFFFF/silentripper)
+
 # silentripper
 
 [![Python 3.12.5](https://img.shields.io/badge/Python-3.12.5-yellow.svg)](http://www.python.org/download/)
