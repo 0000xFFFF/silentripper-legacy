@@ -7,25 +7,51 @@ import threading
 from globals import Variables
 
 def format_time(seconds):
-    return time.strftime("%H:%M:%S", time.gmtime(float(seconds)))
+    seconds = int(float(seconds))
 
-def format_elapsed(elapsed: float) -> str:
+    years, seconds = divmod(seconds, 31536000)
+    months, seconds = divmod(seconds, 2592000)
+    days, seconds = divmod(seconds, 86400)
+
+    time_str = time.strftime("%H:%M:%S", time.gmtime(seconds))
+
+    if years:
+        return f"{years}y {months}mo {days}d {time_str}"
+    elif months:
+        return f"{months}mo {days}d {time_str}"
+    elif days:
+        return f"{days}d {time_str}"
+
+    return time_str
+
+def format_seconds(elapsed: float) -> str:
     """Convert elapsed time in seconds to human readable format"""
     if elapsed < 0.001:
-        return f"{elapsed*1000:.2f}ms"
+        return f"{elapsed * 1000:.2f}ms"
     elif elapsed < 1:
-        return f"{elapsed*1000:.0f}ms"
-    elif elapsed < 60:
-        return f"{elapsed:.1f}s"
-    elif elapsed < 3600:
-        minutes = int(elapsed // 60)
-        seconds = int(elapsed % 60)
-        return f"{minutes}m {seconds}s"
-    else:
-        hours = int(elapsed // 3600)
-        minutes = int((elapsed % 3600) // 60)
-        seconds = int(elapsed % 60)
+        return f"{elapsed * 1000:.0f}ms"
+
+    seconds = int(elapsed)
+
+    years, seconds = divmod(seconds, 31536000)
+    months, seconds = divmod(seconds, 2592000)
+    days, seconds = divmod(seconds, 86400)
+    hours, seconds = divmod(seconds, 3600)
+    minutes, seconds = divmod(seconds, 60)
+
+    if years or months:
+        return f"{years}y {months}mo {days}d {hours}h {minutes}m {seconds}s"
+
+    if days:
+        return f"{days}d {hours}h {minutes}m {seconds}s"
+
+    if hours:
         return f"{hours}h {minutes}m {seconds}s"
+
+    if minutes:
+        return f"{minutes}m {seconds}s"
+
+    return f"{elapsed:.1f}s"
 
 # Get total video duration
 def get_video_duration(file_path):
